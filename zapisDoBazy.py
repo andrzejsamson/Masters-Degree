@@ -3,7 +3,7 @@ from datetime import datetime
 
 def zapis(fraza):
     try:
-        print("Wyszukiwana fraza " + fraza)
+        print("Wyszukiwana fraza " + fraza + "...")
         db = sqlite3.connect('gbif.db')
         db.row_factory = sqlite3.Row
         datetime_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
