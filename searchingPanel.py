@@ -3,7 +3,7 @@ import template as tem
 import zapisDoBazy as zapis
 import wczytywanieBazy as wczyt
 
-class Panel(wx.Frame):
+class searchingPanel(wx.Frame):
     def __init__(self,parent,title):
         wx.Panel.__init__(self, parent=parent, title=title)
         self.Maximize()
@@ -43,6 +43,6 @@ class Panel(wx.Frame):
                 self.searchedDate.SetLabel(" First searching ")
 
 app = wx.App(False)
-frame = Panel(None, "GBIF Monitoring v1.0")
+frame = searchingPanel(None, "GBIF Monitoring v1.0")
 frame.Show()
 app.MainLoop()

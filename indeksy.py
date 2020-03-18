@@ -4,10 +4,14 @@ def indeksy(lista):
     #Sprawdzenie czy podany argument jest listą:
     if type(lista) != list:
         return "Podany argument musi być listą"
-    maxValue = max(lista) #maksymalna wartosc w populacji
+    maxValue = max(lista) #maksymalna liczebność gatunku w populacji
     liczebnosc = 0
     for i in lista:
-        liczebnosc = liczebnosc + i #obliczenie liczebności populacji
+        liczebnosc = liczebnosc + i #obliczenie liczebności całej populacji
+
+    #Bogactwo gatunkowe (liczba gatunków):
+    rich = len(lista)
+    
     #Indeks Bergera-Parkera:
     bp = maxValue/liczebnosc
 
@@ -25,4 +29,4 @@ def indeksy(lista):
     sim = sim / (liczebnosc * (liczebnosc - 1))
 
     #Zwrócenie wyników indeksów:
-    return bp, sw, sim
+    return rich, bp, sw, sim

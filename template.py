@@ -19,3 +19,7 @@ def guzik(self,napis,poz1,poz2,roz1=100,roz2=25,font=12):
     rozmiar = wx.Font(font, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
     button.SetFont(rozmiar)
     return button
+
+def lista(self,poz1,poz2,roz1=100,roz2=250,style=wx.LC_REPORT):
+    listaCtrl = wx.ListCtrl(self, wx.ID_ANY, pos=(poz1,poz2), size=(roz1,roz2), style=style)
+    return listaCtrl
