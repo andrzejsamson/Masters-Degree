@@ -132,6 +132,10 @@ class indexPanel(wx.Frame):
             return
         except:
             pass
+
+        if self.indexes[0] == None:
+            self.message.SetLabel("Error, could not calculate indexes. Check your data")
+            return
         
         self.richnessText = tem.tekst(self, (self.listExcel.GetSize()[0] + 100), 247, "Richness: ", 14)
         self.richness = tem.tekst(self, (self.listExcel.GetSize()[0] + 270), 250, (" " + str(self.indexes[0]) + " "))
