@@ -22,6 +22,14 @@ class searchingPanel(wx.Frame):
         self.searchedDate = tem.tekst(self, 170, 120, "")
         self.searchedDate.SetForegroundColour((50,0,255))
         self.searchedDate.SetBackgroundColour((255,255,255))
+        self.roz1 = self.GetSize()[0]
+        self.listSearched = tem.lista(self, 30, 200, (self.roz1-70), 300)
+        self.listSize = self.listSearched.GetSize()[0]
+        self.listSearched.InsertColumn(0, "LP:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.03))
+        self.listSearched.InsertColumn(1, "Region:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
+        self.listSearched.InsertColumn(2, "Nazwa:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.47))
+        self.listSearched.InsertColumn(3, "Data:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.1))
+        self.listSearched.InsertColumn(4, "Wydawca:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
 
     def onEnter(self, e):
         self.search(e)
