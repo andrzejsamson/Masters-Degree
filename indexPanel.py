@@ -129,7 +129,6 @@ class indexPanel(wx.Frame):
             self.sw.Destroy()
             self.simText.Destroy()
             self.sim.Destroy()
-            return
         except:
             pass
 

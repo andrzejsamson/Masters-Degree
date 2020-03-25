@@ -31,5 +31,5 @@ def indeksy(lista):
 
         #Zwrócenie wyników indeksów:
         return rich, bp, sw, sim
-    except:
+    except: #w razie niepowodzenia:
         return None, None, None, None
