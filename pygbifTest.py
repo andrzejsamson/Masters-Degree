@@ -1,24 +1,38 @@
 from pygbif import species as species
 from pygbif import occurrences as occ
+import datetime
 
-#Wyświetlanie liczby rekordów:
-"""
-splist = ['Cyanocitta stelleri', 'Junco hyemalis', 'Aix sponsa',
-'Ursus americanus', 'Pinus contorta', 'Poa annuus']
+def searching(name, myDate):
+    now = datetime.datetime.now().strftime("%Y-%m-%d")
 
-keys = [ species.name_backbone(x)['usageKey'] for x in splist ]
-out = [ occ.search(taxonKey = x, limit=0)['count'] for x in keys ]
+    x = occ.search(q=name, eventDate=(myDate+','+now))
 
-x = dict(zip(splist, out))
-print(sorted(x.items(), key=lambda z:z[1], reverse=True))
-"""
-##############################################################
+    dane = (x['results'])
+    limit = len(dane)
 
-x = occ.search(q="Riethia Pantera", limit=2)
-#print(x)
+    wektor = list()
 
-dane = (x['results'])
-print(dane[0]['country'])
-print(dane[0]['scientificName'])
-print(dane[0]['eventDate'])
-print(dane[0]['recordedBy'])
+    for i in range(limit):
+        country = None
+        scientificName = None
+        eventDate = None
+        recordedBy = None
+        try:
+            country = dane[i]['country']
+        except:
+            pass
+        try:
+            scientificName = dane[i]['scientificName']
+        except:
+            pass
+        try:
+            eventDate = dane[i]['eventDate']
+        except:
+            pass
+        try:
+            recordedBy = dane[i]['recordedBy']
+        except:
+            pass
+        wektor.append((i+1,country,scientificName,eventDate,recordedBy))
+
+    return wektor

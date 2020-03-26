@@ -2,6 +2,8 @@ import wx
 import template as tem
 import zapisDoBazy as zapis
 import wczytywanieBazy as wczyt
+import pygbifTest as gbifSearch
+import datetime
 
 class searchingPanel(wx.Frame):
     def __init__(self,parent,title):
@@ -23,22 +25,27 @@ class searchingPanel(wx.Frame):
         self.searchedDate.SetForegroundColour((50,0,255))
         self.searchedDate.SetBackgroundColour((255,255,255))
         self.roz1 = self.GetSize()[0]
-        self.listSearched = tem.lista(self, 30, 200, (self.roz1-70), 300)
+        self.listSearched = tem.lista(self, 30, 200, (self.roz1-70), 450)
         self.listSize = self.listSearched.GetSize()[0]
-        self.listSearched.InsertColumn(0, "LP:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.03))
-        self.listSearched.InsertColumn(1, "Region:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
-        self.listSearched.InsertColumn(2, "Nazwa:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.47))
-        self.listSearched.InsertColumn(3, "Data:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.1))
-        self.listSearched.InsertColumn(4, "Wydawca:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
+        self.listSearched.InsertColumn(0, "ID:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.03))
+        self.listSearched.InsertColumn(1, "Country:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
+        self.listSearched.InsertColumn(2, "Scientific name:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.47))
+        self.listSearched.InsertColumn(3, "Date:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.1))
+        self.listSearched.InsertColumn(4, "Recorded by:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
 
     def onEnter(self, e):
         self.search(e)
 
     def search(self, e):
+        self.oneYear = (datetime.datetime.now()-datetime.timedelta(100)).strftime("%Y-%m-%d")
         self.message.SetLabel("")
         self.searchedFrase.SetLabel("")
         self.searchedDate.SetLabel("")
         self.searchedItem = self.searchingField.GetValue()
+        try:
+            self.listSearched.DeleteAllItems()
+        except:
+            pass
         if self.searchedItem == "":
             self.message.SetLabel("You need to enter an item in the field to search")
         else:
@@ -47,8 +54,14 @@ class searchingPanel(wx.Frame):
             self.searchedFrase.SetLabel(" " + self.searchedItem + " ")
             if self.searchedWord != None:
                 self.searchedDate.SetLabel(" " + self.searchedWord + " ")
+                self.dataTable = gbifSearch.searching(self.searchedItem, self.searchedWord)
+                for i in self.dataTable:
+                    self.listSearched.Append(i)
             else:
-                self.searchedDate.SetLabel(" First searching ")
+                self.searchedDate.SetLabel(" First searching - results from last 100 days ")
+                self.dataTable = gbifSearch.searching(self.searchedItem, self.oneYear)
+                for i in self.dataTable:
+                    self.listSearched.Append(i)
 
 app = wx.App(False)
 frame = searchingPanel(None, "GBIF Monitoring v1.0")
