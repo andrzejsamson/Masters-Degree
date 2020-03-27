@@ -11,6 +11,7 @@ def searching(name, myDate):
     limit = len(dane)
 
     wektor = list()
+    listOfKeys = list()
 
     for i in range(limit):
         country = None
@@ -33,6 +34,7 @@ def searching(name, myDate):
             recordedBy = dane[i]['recordedBy']
         except:
             pass
+        listOfKeys.append(dane[i]['key'])
         wektor.append((i+1,country,scientificName,eventDate,recordedBy))
 
-    return wektor
+    return wektor, listOfKeys

@@ -4,6 +4,7 @@ import zapisDoBazy as zapis
 import wczytywanieBazy as wczyt
 import pygbifTest as gbifSearch
 import datetime
+import webbrowser
 
 class searchingPanel(wx.Frame):
     def __init__(self,parent,title):
@@ -32,15 +33,20 @@ class searchingPanel(wx.Frame):
         self.listSearched.InsertColumn(2, "Scientific name:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.47))
         self.listSearched.InsertColumn(3, "Date:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.1))
         self.listSearched.InsertColumn(4, "Recorded by:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
+        self.browserButton = tem.guzik(self, "Go to website", 30, 158)
+        self.Bind(wx.EVT_BUTTON, self.goToWebsite, self.browserButton)
+        self.browserMessage = tem.tekst(self, 150, 162, "", 10)
+        self.browserMessage.SetForegroundColour((0,0,255))
 
     def onEnter(self, e):
         self.search(e)
 
     def search(self, e):
-        self.oneYear = (datetime.datetime.now()-datetime.timedelta(100)).strftime("%Y-%m-%d")
+        self.last60Days = (datetime.datetime.now()-datetime.timedelta(60)).strftime("%Y-%m-%d")
         self.message.SetLabel("")
         self.searchedFrase.SetLabel("")
         self.searchedDate.SetLabel("")
+        self.browserMessage.SetLabel("")
         self.searchedItem = self.searchingField.GetValue()
         try:
             self.listSearched.DeleteAllItems()
@@ -54,14 +60,23 @@ class searchingPanel(wx.Frame):
             self.searchedFrase.SetLabel(" " + self.searchedItem + " ")
             if self.searchedWord != None:
                 self.searchedDate.SetLabel(" " + self.searchedWord + " ")
-                self.dataTable = gbifSearch.searching(self.searchedItem, self.searchedWord)
+                self.dataTable, self.keys = gbifSearch.searching(self.searchedItem, self.searchedWord)
                 for i in self.dataTable:
                     self.listSearched.Append(i)
             else:
-                self.searchedDate.SetLabel(" First searching - results from last 100 days ")
-                self.dataTable = gbifSearch.searching(self.searchedItem, self.oneYear)
+                self.searchedDate.SetLabel(" First searching - results from last 60 days ")
+                self.dataTable, self.keys = gbifSearch.searching(self.searchedItem, self.last60Days)
                 for i in self.dataTable:
                     self.listSearched.Append(i)
+
+    def goToWebsite(self, e):
+        self.browserMessage.SetLabel("")
+        self.myChoice = self.listSearched.GetFirstSelected()
+        if self.myChoice == -1:
+            self.browserMessage.SetLabel("You need to choose an item from the list")
+            return
+        webbrowser.open(('http://gbif.org/occurrence/'+str(self.keys[self.myChoice])), new=2)
+
 
 app = wx.App(False)
 frame = searchingPanel(None, "GBIF Monitoring v1.0")
