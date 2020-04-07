@@ -1,13 +1,19 @@
 import wx
 import xlrd
-import template as tem
-import indeksy as ind
-import openExcelFunction as openExcel
+import template as tem #stworzona podkładka do interfejsu
+import indeksy as ind #aplikacja licząca indeksy
+import openExcelFunction as openExcel #funkcja do otwierania plików excel
 
 class indexPanel(wx.Frame):
+    """
+    Panel służy do wczytywania plików typu excel oraz liczeniu parametrów bioróżnorodności na podstawie danych
+    z wybranej kolumny wczytanego pliku.
+    """
     def __init__(self,parent,title):
         wx.Panel.__init__(self, parent=parent, title=title)
-        self.Maximize()
+        self.Maximize() #okno na cały ekran
+
+        #wygląd panelu:
         self.excelFile = tem.tekst(self, 30, 30, "Choose an excel file:", 14)
         self.excelButton = tem.guzik(self, "Excel file", 230, 30)
         self.Bind(wx.EVT_BUTTON, self.readExcel, self.excelButton)
@@ -24,11 +30,22 @@ class indexPanel(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.calculate, self.indexButton)
 
     def readExcel(self, e):
+        """
+        Funkcja czytająca plik excel. Uruchamia się po kliknięciu guzika 'Excel file'. Otwiera się okno, w którym należy wybrać
+        plik typu excel. Gdy nie wybierze się pliku pojawi się informacja o błędzie oraz nie będzie można wykonywać dalszych
+        funkcji panelu. FUnkcja korzysta z napisanego skryptu 'openExcelFunction.py'. Gdy plik zostanie wczytany poprawnie,
+        informacje z niego pojawią się w tabeli w panelu.
+        """
+        #czyszczenie informacji:
         self.message.SetLabel("")
         self.directory = ""
         self.file = ""
         self.choices = [""]
-        self.dialog = wx.FileDialog(self, 'Open File', self.directory, self.file, wildcard="Arkusze (*.xlsx;*.xlsm;*.xlsb;*.xls)|*.xlsx;*.xlsm;*.xlsb;*.xls|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+
+        #wybieranie pliku excel:
+        self.dialog = wx.FileDialog(self, 'Open File', self.directory, self.file, wildcard="Arkusze (*.xlsx;*.xlsm;*.xlsb;*.xls)|*.xlsx;*.xlsm;*.xlsb;*.xls", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        #wildcard ogranicza wybranie pliku tylko typu excel
+        #zapisanie wybranego pliku do zmiennej, gdy się wyjdzie bez wyboru - pojawi się błąd
         if self.dialog.ShowModal() == wx.ID_CANCEL:
             self.message.SetLabel("You need to choose a file")
             self.chosenFile.SetLabel("")
@@ -46,11 +63,14 @@ class indexPanel(wx.Frame):
                 return
             except:
                 return
-        
+
+        #zapisanie ścieżki i nazwy pliku:
         self.directory = self.dialog.GetPath()
         self.file = self.dialog.GetFilename()
         self.chosenFile.SetLabel(" " + self.file + " ")
         self.choices.clear()
+
+        #otwarcie pliku excel oraz dodanie kolumn do wyboru
         self.numberOfColumns, self.numberOfRows = openExcel.openFile(self.directory)
         if self.numberOfColumns == 0:
             self.choices = [""]
@@ -72,7 +92,8 @@ class indexPanel(wx.Frame):
             self.sim.Destroy()
         except:
             pass
-        
+
+        #wpisanie danych z excela w tabelę w aplikacji:
         self.listExcel = tem.lista(self, 30, 200, (100 + (50*self.numberOfColumns)))
         for i in range(self.numberOfColumns):
             self.listExcel.InsertColumn(i, self.choices[i], width = (self.listExcel.GetSize()[0] / self.numberOfColumns))
@@ -85,8 +106,12 @@ class indexPanel(wx.Frame):
             self.listExcel.Append(i)
 
     def calculate(self, e):
+        """
+        Funkcja obliczająca parametry bioróznorodności po wybraniu kolumny, z której ma liczyć.
+        """
         self.message.SetLabel("")
-        self.column = self.choicesBox.GetValue()
+        self.column = self.choicesBox.GetValue() #pobranie informacji o wybranej kolumnie
+        #wyświetlenie informacji o błędzie, gdy nie wybrano żadnej kolumny:
         if (self.column == "" or self.column == None):
             self.message.SetLabel("You need to choose a column")
             try:
@@ -102,9 +127,11 @@ class indexPanel(wx.Frame):
             except:
                 return
 
+        #zapisanie wybranych daych w liście:
         self.listForIndexes = openExcel.readColumns(self.directory, (ord(self.column) - 65), self.numberOfRows)
+        #komunikat o błędzie, gdyby w wybranej kolumnie były nazwy zamiast liczb lub kolumna byłaby pusta
         if isinstance(self.listForIndexes[0], str):
-            self.message.SetLabel("Chosen data can not be a string")
+            self.message.SetLabel("Chosen data can not be a string or empty")
             try:
                 self.richnessText.Destroy()
                 self.richness.Destroy()
@@ -132,10 +159,12 @@ class indexPanel(wx.Frame):
         except:
             pass
 
-        if self.indexes[0] == None:
-            self.message.SetLabel("Error, could not calculate indexes. Check your data")
+        #wyświetlenie komunikatu o błędzie, gdyby w danych jedna wartość lub więcej były puste, stringiem lub zerem
+        if ((self.indexes[0] == None) or (self.indexes[0] == -1)):
+            self.message.SetLabel("Error, could not calculate indexes. Check your data. It can not have strings or 0")
             return
-        
+
+        #obliczenie indeksów za pomocą napisanego skryptu oraz wyświetlenie wyników w panelu:
         self.richnessText = tem.tekst(self, (self.listExcel.GetSize()[0] + 100), 247, "Richness: ", 14)
         self.richness = tem.tekst(self, (self.listExcel.GetSize()[0] + 270), 250, (" " + str(self.indexes[0]) + " "))
         self.richness.SetBackgroundColour((255,255,255))
