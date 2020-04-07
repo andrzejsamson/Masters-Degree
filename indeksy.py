@@ -8,7 +8,7 @@ def indeksy(lista):
         maxValue = max(lista) #maksymalna liczebność gatunku w populacji
         liczebnosc = 0
         for i in lista:
-            if i == 0:
+            if i <= 0:
                 return -1, -1, -1, -1
             liczebnosc = liczebnosc + i #obliczenie liczebności całej populacji
 
