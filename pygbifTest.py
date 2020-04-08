@@ -1,4 +1,3 @@
-from pygbif import species as species
 from pygbif import occurrences as occ
 import datetime
 
@@ -11,7 +10,6 @@ def searching(name, myDate):
     limit = len(dane)
 
     wektor = list()
-    listOfKeys = list()
 
     for i in range(limit):
         country = None
@@ -34,7 +32,11 @@ def searching(name, myDate):
             recordedBy = dane[i]['recordedBy']
         except:
             pass
-        listOfKeys.append(dane[i]['key'])
-        wektor.append((i+1,country,scientificName,eventDate,recordedBy))
+        dataKey = dane[i]['key']
+        wektor.append((dataKey,country,scientificName,eventDate,recordedBy))
 
-    return wektor, listOfKeys
+    wektor.sort(key=takeDate,reverse=True)
+    return wektor
+
+def takeDate(elem):
+    return elem[3]

@@ -28,9 +28,9 @@ class searchingPanel(wx.Frame):
         self.roz1 = self.GetSize()[0]
         self.listSearched = tem.lista(self, 30, 200, (self.roz1-70), 450)
         self.listSize = self.listSearched.GetSize()[0]
-        self.listSearched.InsertColumn(0, "ID:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.03))
+        self.listSearched.InsertColumn(0, "Key:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
         self.listSearched.InsertColumn(1, "Country:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
-        self.listSearched.InsertColumn(2, "Scientific name:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.47))
+        self.listSearched.InsertColumn(2, "Scientific name:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.3))
         self.listSearched.InsertColumn(3, "Date:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.1))
         self.listSearched.InsertColumn(4, "Recorded by:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
         self.browserButton = tem.guzik(self, "Go to website", 30, 158)
@@ -60,12 +60,12 @@ class searchingPanel(wx.Frame):
             self.searchedFrase.SetLabel(" " + self.searchedItem + " ")
             if self.searchedWord != None:
                 self.searchedDate.SetLabel(" " + self.searchedWord + " ")
-                self.dataTable, self.keys = gbifSearch.searching(self.searchedItem, self.searchedWord)
+                self.dataTable = gbifSearch.searching(self.searchedItem, self.searchedWord)
                 for i in self.dataTable:
                     self.listSearched.Append(i)
             else:
-                self.searchedDate.SetLabel(" First searching - results from last 60 days ")
-                self.dataTable, self.keys = gbifSearch.searching(self.searchedItem, self.last60Days)
+                self.searchedDate.SetLabel(" First searching - max. 300 results from last 60 days ")
+                self.dataTable = gbifSearch.searching(self.searchedItem, self.last60Days)
                 for i in self.dataTable:
                     self.listSearched.Append(i)
 
@@ -75,7 +75,7 @@ class searchingPanel(wx.Frame):
         if self.myChoice == -1:
             self.browserMessage.SetLabel("You need to choose an item from the list")
             return
-        webbrowser.open(('http://gbif.org/occurrence/'+str(self.keys[self.myChoice])), new=2)
+        webbrowser.open(('http://gbif.org/occurrence/'+str(self.dataTable[self.myChoice][0])), new=2)
 
 
 app = wx.App(False)
