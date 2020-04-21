@@ -1,4 +1,5 @@
 import wx
+import wx.lib.plot as plot
 
 def tekst(self,poz1,poz2,napis,font=12):
     staticText = wx.StaticText(self, wx.ID_ANY, pos=(poz1,poz2), label=napis)
@@ -23,3 +24,7 @@ def guzik(self,napis,poz1,poz2,roz1=100,roz2=25,font=12):
 def lista(self,poz1,poz2,roz1=100,roz2=250,style=wx.LC_REPORT):
     listaCtrl = wx.ListCtrl(self, wx.ID_ANY, pos=(poz1,poz2), size=(roz1,roz2), style=style)
     return listaCtrl
+
+def check(self,poz1,poz2,napis):
+    checkBox = wx.CheckBox(self, label=napis, pos=(poz1,poz2))
+    return checkBox
