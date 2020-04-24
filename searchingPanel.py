@@ -1,15 +1,25 @@
 import wx
-import template as tem
-import zapisDoBazy as zapis
-import wczytywanieBazy as wczyt
-import pygbifTest as gbifSearch
-import datetime
-import webbrowser
+import template as tem #skrypt ułatwiający tworzenie interfejsu
+import zapisDoBazy as zapis #skrypt, zapisujący wyszukiwane zagadnienie do bazy danych
+import wczytywanieBazy as wczyt #skrypt wczytujący z bazy danych kiedy ostatni raz wyszukiwano zagadnienia
+import pygbifTest as gbifSearch #skrypt obsługujący łączenie się z baza GBIF
+import datetime #pakiet potrzebny do pobrania aktualnej daty
+import webbrowser #pakiet do wyszukiwania wybranego artykułu w bazie gbif
 
 class searchingPanel(wx.Frame):
+    """
+    Panel ma na celu przeszukiwać bazę GBIF.org na podstawie wpisanej frazy. Najpierw sprawdza w
+    bazie danych tej aplikacji czy taka fraza była już wyszukiwana. Jeżeli tak, pokazuje wyniki
+    od czasu ostatniego wyszukiwania. Jeżeli jest to pierwsze wyszukiwanie, to pokazuje wyniki
+    z ostatnich 60 dni. Limit wyszukanych rekordów to 300 (ograniczenie narzucone przez funkcję).
+    Wyświetla wszystkei wyniki szeregując je od najmłodszego na górze. Kiedy zaznaczy się rekord,
+    można nacisnąć guzik i zostanie otwarta przeglądarka internetowa wraz ze stroną dla tego rekordu
+    w GBIF.org
+    """
     def __init__(self,parent,title):
         wx.Panel.__init__(self, parent=parent, title=title)
         self.Maximize()
+        #Wygląd panelu:
         self.searchingTekst = tem.tekst(self, 30, 28, "Enter what you want to search:", 14)
         self.searchingField = tem.pole(self, 300, 30)
         self.Bind(wx.EVT_TEXT_ENTER, self.onEnter, self.searchingField)
@@ -28,33 +38,41 @@ class searchingPanel(wx.Frame):
         self.roz1 = self.GetSize()[0]
         self.listSearched = tem.lista(self, 30, 200, (self.roz1-70), 450)
         self.listSize = self.listSearched.GetSize()[0]
-        self.listSearched.InsertColumn(0, "Key:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
-        self.listSearched.InsertColumn(1, "Country:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
-        self.listSearched.InsertColumn(2, "Scientific name:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.3))
-        self.listSearched.InsertColumn(3, "Date:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.1))
-        self.listSearched.InsertColumn(4, "Recorded by:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.2))
+        self.listSearched.InsertColumn(0, "Key:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.15))
+        self.listSearched.InsertColumn(1, "Country:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.15))
+        self.listSearched.InsertColumn(2, "Scientific name:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.35))
+        self.listSearched.InsertColumn(3, "Date:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.12))
+        self.listSearched.InsertColumn(4, "Recorded by:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.23))
         self.browserButton = tem.guzik(self, "Go to website", 30, 158)
         self.Bind(wx.EVT_BUTTON, self.goToWebsite, self.browserButton)
         self.browserMessage = tem.tekst(self, 150, 162, "", 10)
         self.browserMessage.SetForegroundColour((0,0,255))
 
     def onEnter(self, e):
+        #Funkcja włącza się nie tylko po wcisnięciu guzika, ale również po wciśnięciu 'Enter' w polu tekstowym
         self.search(e)
 
     def search(self, e):
-        self.last60Days = (datetime.datetime.now()-datetime.timedelta(60)).strftime("%Y-%m-%d")
+        """
+        Funkcja która szuka rekordów w bazie. Najpierw przeszukuje bazę aplikacji czy fraza była
+        już wyszukiwana. Wyświetla błędy, gdy pole do wyszukiwania jest puste
+        """
+        self.last60Days = (datetime.datetime.now()-datetime.timedelta(60)).strftime("%Y-%m-%d") #zapisanie daty z 60 dni temu
+        #czyszczenie wiadomości:
         self.message.SetLabel("")
         self.searchedFrase.SetLabel("")
         self.searchedDate.SetLabel("")
         self.browserMessage.SetLabel("")
-        self.searchedItem = self.searchingField.GetValue()
+        
+        self.searchedItem = self.searchingField.GetValue() #zapisanie wyszukiwanej frazy
         try:
-            self.listSearched.DeleteAllItems()
+            self.listSearched.DeleteAllItems() #wyczyszczenie poprzednich wyszukiwań z tabeli
         except:
             pass
         if self.searchedItem == "":
-            self.message.SetLabel("You need to enter an item in the field to search")
+            self.message.SetLabel("You need to enter an item in the field to search") #wyświetlenie błędu, gdy nic nie będzie wpisane
         else:
+            #wczytywanie słowa z bazy danych oraz zapisanie do bazy wyszukania. Wyświtlenie wyników w tabeli
             self.searchedWord = wczyt.wczytanie(self.searchedItem)
             zapis.zapis(self.searchedItem)
             self.searchedFrase.SetLabel(" " + self.searchedItem + " ")
@@ -70,10 +88,13 @@ class searchingPanel(wx.Frame):
                     self.listSearched.Append(i)
 
     def goToWebsite(self, e):
+        """
+        Po wybraniu rekordu funkcja ta otwiera stronę rekordu w gbif.org w przeglądarce
+        """
         self.browserMessage.SetLabel("")
         self.myChoice = self.listSearched.GetFirstSelected()
         if self.myChoice == -1:
-            self.browserMessage.SetLabel("You need to choose an item from the list")
+            self.browserMessage.SetLabel("You need to choose an item from the list") #wyświetlenie błędu gdy nie wybrano rekordu
             return
         webbrowser.open(('http://gbif.org/occurrence/'+str(self.dataTable[self.myChoice][0])), new=2)
 
