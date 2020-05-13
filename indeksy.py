@@ -44,6 +44,6 @@ def indeksy(lista):
             sim = sim / (liczebnosc * (liczebnosc - 1))
 
         #Zwrócenie wyników indeksów:
-        return rich, bp, sw, sim, maxSW
+        return rich, round(bp,5), round(sw,5), round(sim,5), round(maxSW,5)
     except: #w razie niepowodzenia (gdy w komórce będzie tekst):
         return None, None, None, None, None

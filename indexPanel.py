@@ -13,7 +13,7 @@ class indexPanel(wx.Frame):
     def __init__(self,parent,title):
         wx.Panel.__init__(self, parent=parent, title=title)
         self.Maximize() #okno na cały ekran
-
+        
         #wygląd panelu:
         self.excelFile = tem.tekst(self, 30, 30, "Choose an excel file:", 14)
         self.excelButton = tem.guzik(self, "Excel file", 230, 30)
@@ -65,6 +65,9 @@ class indexPanel(wx.Frame):
                 self.plotter1.Destroy()
                 self.plotter2.Destroy()
                 self.plotter3.Destroy()
+                self.savePlotter1.Destroy()
+                self.savePlotter2.Destroy()
+                self.savePlotter3.Destroy()
                 return
             except:
                 return
@@ -98,6 +101,9 @@ class indexPanel(wx.Frame):
             self.plotter1.Destroy()
             self.plotter2.Destroy()
             self.plotter3.Destroy()
+            self.savePlotter1.Destroy()
+            self.savePlotter2.Destroy()
+            self.savePlotter3.Destroy()
         except:
             pass
 
@@ -107,21 +113,34 @@ class indexPanel(wx.Frame):
             self.listExcel.InsertColumn(i, self.choices[i], width = 60)
 
         self.wektor = list()
-        for i in range(self.numberOfRows):
+
+        if self.numberOfRows > 30: #ograniczenie widocznych wyników do 30 gdy jest ich więcej
+            self.values = 30
+        else:
+            self.values = self.numberOfRows
+
+        for i in range(self.values):
             self.wektor.append(openExcel.readValues(self.directory,i,self.numberOfColumns))
 
         for i in self.wektor:
             self.listExcel.Append(i)
 
         #Tworzenie wykresów zmiany bioróżnorodności:
+        #Wykres B-P:
         self.plotter1 = plot.PlotCanvas(self, pos=(700,30))
         self.plotter1.SetInitialSize(size=(600,200))
         self.plotter1.SetEnableLegend(True)
         self.dataBP = list()
         self.marker1 = plot.PolyMarker(self.dataBP, marker='circle', colour='red', legend='Berger-Parker')
         self.gc1 = plot.PlotGraphics([self.marker1], 'The change of Berger-Parker index', 'Column', 'Index value')
-        self.plotter1.Draw(self.gc1, xAxis=(int(0),int((self.numberOfColumns+1))))
-        
+        self.plotter1.Draw(self.gc1, xAxis=(int(0),int((self.numberOfColumns+1))), yAxis=(int(0),int(1)))
+
+        #Guzik do zapisywania wykresu B-P:
+        self.savePlotter1 = tem.guzik(self, "", 1300, 190, 40, 40)
+        self.Bind(wx.EVT_BUTTON, self.save1, self.savePlotter1)
+        self.savePlotter1.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_BUTTON))
+
+        #Wykres S-W:
         self.plotter2 = plot.PlotCanvas(self, pos=(700,260))
         self.plotter2.SetInitialSize(size=(600,200))
         self.plotter2.SetEnableLegend(True)
@@ -130,13 +149,24 @@ class indexPanel(wx.Frame):
         self.gc2 = plot.PlotGraphics([self.marker2], 'The change of Shannon-Wiener index', 'Column', 'Index value')
         self.plotter2.Draw(self.gc2, xAxis=(int(0),int((self.numberOfColumns+1))))
 
+        #Guzik do zapisywania wykresu S-W:
+        self.savePlotter2 = tem.guzik(self, "", 1300, 420, 40, 40)
+        self.Bind(wx.EVT_BUTTON, self.save2, self.savePlotter2)
+        self.savePlotter2.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_BUTTON))
+
+        #Wykres Simpsona:
         self.plotter3 = plot.PlotCanvas(self, pos=(700,490))
         self.plotter3.SetInitialSize(size=(600,200))
         self.plotter3.SetEnableLegend(True)
         self.dataSIM = list()
         self.marker3 = plot.PolyMarker(self.dataSIM, marker='cross', colour='blue', legend='Simpson')
         self.gc3 = plot.PlotGraphics([self.marker3], 'The change of Simpson index', 'Column', 'Index value')
-        self.plotter3.Draw(self.gc3, xAxis=(int(0),int((self.numberOfColumns+1))))
+        self.plotter3.Draw(self.gc3, xAxis=(int(0),int((self.numberOfColumns+1))), yAxis=(int(0),int(1)))
+
+        #Guzik do zapisywania wykresu Simpsona:
+        self.savePlotter3 = tem.guzik(self, "", 1300, 650, 40, 40)
+        self.Bind(wx.EVT_BUTTON, self.save3, self.savePlotter3)
+        self.savePlotter3.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_BUTTON))
 
     def calculate(self, e):
         """
@@ -207,7 +237,7 @@ class indexPanel(wx.Frame):
         #Zaktualizowanie wykresów o policzone indeksy:
         self.marker1 = plot.PolyMarker(self.dataBP, marker='circle', colour='red', legend='Berger-Parker')
         self.gc1 = plot.PlotGraphics([self.marker1], 'The change of Berger-Parker index', 'Column', 'Index value')
-        self.plotter1.Draw(self.gc1, xAxis=(int(0),int((self.numberOfColumns+1))))
+        self.plotter1.Draw(self.gc1, xAxis=(int(0),int((self.numberOfColumns+1))), yAxis=(int(0),int(1)))
 
         self.marker2 = plot.PolyMarker(self.dataSW, marker='triangle', colour='black', legend='Shannon-Wiener')
         self.gc2 = plot.PlotGraphics([self.marker2], 'The change of Shannon-Wiener index', 'Column', 'Index value')
@@ -215,7 +245,25 @@ class indexPanel(wx.Frame):
 
         self.marker3 = plot.PolyMarker(self.dataSIM, marker='cross', colour='blue', legend='Simpson')
         self.gc3 = plot.PlotGraphics([self.marker3], 'The change of Simpson index', 'Column', 'Index value')
-        self.plotter3.Draw(self.gc3, xAxis=(int(0),int((self.numberOfColumns+1))))
+        self.plotter3.Draw(self.gc3, xAxis=(int(0),int((self.numberOfColumns+1))), yAxis=(int(0),int(1)))
+
+    def save1(self, e):
+        """
+        Funkcja zapisuje wykres Bergera-Parkera pod wskazaną nazwą i lokalizacją
+        """
+        self.plotter1.SaveFile()
+
+    def save2(self, e):
+        """
+        Funkcja zapisuje wykres Shannona-Wienera pod wskazaną nazwą i lokalizacją
+        """
+        self.plotter2.SaveFile()
+
+    def save3(self, e):
+        """
+        Funkcja zapisuje wykres Simpsona pod wskazaną nazwą i lokalizacją
+        """
+        self.plotter3.SaveFile()
 
 
 app = wx.App(False)

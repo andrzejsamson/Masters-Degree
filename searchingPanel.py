@@ -23,8 +23,12 @@ class searchingPanel(wx.Frame):
         self.searchingTekst = tem.tekst(self, 30, 28, "Enter what you want to search:", 14)
         self.searchingField = tem.pole(self, 300, 30)
         self.Bind(wx.EVT_TEXT_ENTER, self.onEnter, self.searchingField)
-        self.searchingButton = tem.guzik(self, "Search", 460, 28)
+        self.searchingButton = tem.guzik(self, "Search by last", 460, 28, 150)
         self.Bind(wx.EVT_BUTTON, self.search ,self.searchingButton)
+        self.searchByDateTekst = tem.tekst(self, 630, 28, "or choose a date:", 14)
+        self.dateToSearch = tem.data(self, 800, 28)
+        self.searchingByDate = tem.guzik(self, "Search by date", 900, 28, 150)
+        self.Bind(wx.EVT_BUTTON, self.searchByDate, self.searchingByDate)
         self.message = tem.tekst(self, 30, 55, "", 10)
         self.message.SetForegroundColour((0,0,255))
         self.searchedFraseTekst = tem.tekst(self, 30, 97, "Searched Item:", 14)
@@ -84,6 +88,43 @@ class searchingPanel(wx.Frame):
             else:
                 self.searchedDate.SetLabel(" First searching - max. 300 results from last 60 days ")
                 self.dataTable = gbifSearch.searching(self.searchedItem, self.last60Days)
+                for i in self.dataTable:
+                    self.listSearched.Append(i)
+
+    def searchByDate(self, e):
+        """
+        Funckja podobna do funkcji search, jednak wyszukuje frazę na podstawie wybranej daty, a nie ostatniego wyszukiwania
+        """
+        self.chosenDate = self.dateToSearch.GetValue() #zapisanie wybranej daty
+        self.chosenDateStr = (str(self.chosenDate)[0:10]) #zamiana wyniku w string
+        self.d = datetime.datetime(int(self.chosenDateStr[6:10]), int(self.chosenDateStr[3:5]), int(self.chosenDateStr[0:2])) #zamiana stringu w date
+        self.x = self.d.strftime("%Y-%m-%d") #potrzebny format do funkcji
+        
+        #czyszczenie wiadomości:
+        self.message.SetLabel("")
+        self.searchedFrase.SetLabel("")
+        self.searchedDate.SetLabel("")
+        self.browserMessage.SetLabel("")
+        self.searchedItem = self.searchingField.GetValue() #zapisanie wyszukiwanej frazy
+        try:
+            self.listSearched.DeleteAllItems() #wyczyszczenie poprzednich wyszukiwań z tabeli
+        except:
+            pass
+        if self.searchedItem == "":
+            self.message.SetLabel("You need to enter an item in the field to search") #wyświetlenie błędu, gdy nic nie będzie wpisane
+        else:
+            #wczytywanie słowa z bazy danych oraz zapisanie do bazy wyszukania. Wyświtlenie wyników w tabeli
+            self.searchedWord = wczyt.wczytanie(self.searchedItem)
+            zapis.zapis(self.searchedItem)
+            self.searchedFrase.SetLabel(" " + self.searchedItem + " ")
+            if self.searchedWord != None:
+                self.searchedDate.SetLabel(" " + self.searchedWord + " ")
+                self.dataTable = gbifSearch.searching(self.searchedItem, self.x)
+                for i in self.dataTable:
+                    self.listSearched.Append(i)
+            else:
+                self.searchedDate.SetLabel(" First searching - max. 300 results ")
+                self.dataTable = gbifSearch.searching(self.searchedItem, self.x)
                 for i in self.dataTable:
                     self.listSearched.Append(i)
 

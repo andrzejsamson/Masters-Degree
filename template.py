@@ -1,5 +1,6 @@
 import wx
-import wx.lib.plot as plot
+import wx.adv
+import datetime
 
 def tekst(self,poz1,poz2,napis,font=12):
     staticText = wx.StaticText(self, wx.ID_ANY, pos=(poz1,poz2), label=napis)
@@ -28,3 +29,7 @@ def lista(self,poz1,poz2,roz1=100,roz2=250,style=wx.LC_REPORT):
 def check(self,poz1,poz2,napis):
     checkBox = wx.CheckBox(self, label=napis, pos=(poz1,poz2))
     return checkBox
+
+def data(self,poz1,poz2):
+    data = wx.adv.DatePickerCtrl(self, wx.ID_ANY, pos=(poz1,poz2))
+    return data
