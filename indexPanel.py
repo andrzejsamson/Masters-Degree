@@ -29,6 +29,8 @@ class indexPanel(wx.Frame):
         self.choicesBox = tem.box(self, 300, 100, self.choices, roz1 = 50, style = wx.CB_DROPDOWN | wx.CB_READONLY)
         self.indexButton = tem.guzik(self, "Calculate", 370, 98)
         self.Bind(wx.EVT_BUTTON, self.calculate, self.indexButton)
+        self.allButton = tem.guzik(self, "Calculate all", 500, 98)
+        self.Bind(wx.EVT_BUTTON, self.calculateAll, self.allButton)
         self.checkBox = tem.check(self, 380, 130, 'has headers')
 
     def readExcel(self, e):
@@ -54,23 +56,45 @@ class indexPanel(wx.Frame):
             self.choicesBox.SetItems(self.choices)
             try:
                 self.listExcel.Destroy()
-                self.richnessText.Destroy()
-                self.richness.Destroy()
-                self.bpText.Destroy()
-                self.bp.Destroy()
-                self.swText.Destroy()
-                self.sw.Destroy()
-                self.simText.Destroy()
-                self.sim.Destroy()
-                self.plotter1.Destroy()
-                self.plotter2.Destroy()
-                self.plotter3.Destroy()
-                self.savePlotter1.Destroy()
-                self.savePlotter2.Destroy()
-                self.savePlotter3.Destroy()
-                return
             except:
-                return
+                pass
+
+            try:
+                self.nb.Destroy()
+            except:
+                pass
+
+            try:
+                self.plotter1.Destroy()
+            except:
+                pass
+
+            try:
+                self.plotter2.Destroy()
+            except:
+                pass
+
+            try:
+                self.plotter3.Destroy()
+            except:
+                pass
+
+            try:
+                self.savePlotter1.Destroy()
+            except:
+                pass
+
+            try:
+                self.savePlotter2.Destroy()
+            except:
+                pass
+
+            try:
+                self.savePlotter3.Destroy()
+            except:
+                pass
+            
+            return
 
         #zapisanie ścieżki i nazwy pliku:
         self.directory = self.dialog.GetPath()
@@ -90,19 +114,40 @@ class indexPanel(wx.Frame):
         
         try:
             self.listExcel.Destroy()
-            self.richnessText.Destroy()
-            self.richness.Destroy()
-            self.bpText.Destroy()
-            self.bp.Destroy()
-            self.swText.Destroy()
-            self.sw.Destroy()
-            self.simText.Destroy()
-            self.sim.Destroy()
+        except:
+            pass
+
+        try:
+            self.nb.Destroy()
+        except:
+            pass
+
+        try:
             self.plotter1.Destroy()
+        except:
+            pass
+
+        try:
             self.plotter2.Destroy()
+        except:
+            pass
+
+        try:
             self.plotter3.Destroy()
+        except:
+            pass
+
+        try:
             self.savePlotter1.Destroy()
+        except:
+            pass
+
+        try:
             self.savePlotter2.Destroy()
+        except:
+            pass
+
+        try:
             self.savePlotter3.Destroy()
         except:
             pass
@@ -133,7 +178,7 @@ class indexPanel(wx.Frame):
         self.dataBP = list()
         self.marker1 = plot.PolyMarker(self.dataBP, marker='circle', colour='red', legend='Berger-Parker')
         self.gc1 = plot.PlotGraphics([self.marker1], 'The change of Berger-Parker index', 'Column', 'Index value')
-        self.plotter1.Draw(self.gc1, xAxis=(int(0),int((self.numberOfColumns+1))), yAxis=(int(0),int(1)))
+        self.plotter1.Draw(self.gc1, xAxis=(int(0),int((self.numberOfColumns))), yAxis=(int(0),int(1)))
 
         #Guzik do zapisywania wykresu B-P:
         self.savePlotter1 = tem.guzik(self, "", 1300, 190, 40, 40)
@@ -147,7 +192,7 @@ class indexPanel(wx.Frame):
         self.dataSW = list()
         self.marker2 = plot.PolyMarker(self.dataSW, marker='triangle', colour='black', legend='Shannon-Wiener')
         self.gc2 = plot.PlotGraphics([self.marker2], 'The change of Shannon-Wiener index', 'Column', 'Index value')
-        self.plotter2.Draw(self.gc2, xAxis=(int(0),int((self.numberOfColumns+1))))
+        self.plotter2.Draw(self.gc2, xAxis=(int(0),int((self.numberOfColumns))))
 
         #Guzik do zapisywania wykresu S-W:
         self.savePlotter2 = tem.guzik(self, "", 1300, 420, 40, 40)
@@ -161,12 +206,15 @@ class indexPanel(wx.Frame):
         self.dataSIM = list()
         self.marker3 = plot.PolyMarker(self.dataSIM, marker='cross', colour='blue', legend='Simpson')
         self.gc3 = plot.PlotGraphics([self.marker3], 'The change of Simpson index', 'Column', 'Index value')
-        self.plotter3.Draw(self.gc3, xAxis=(int(0),int((self.numberOfColumns+1))), yAxis=(int(0),int(1)))
+        self.plotter3.Draw(self.gc3, xAxis=(int(0),int((self.numberOfColumns))), yAxis=(int(0),int(1)))
 
         #Guzik do zapisywania wykresu Simpsona:
         self.savePlotter3 = tem.guzik(self, "", 1300, 650, 40, 40)
         self.Bind(wx.EVT_BUTTON, self.save3, self.savePlotter3)
         self.savePlotter3.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_BUTTON))
+
+        #Notebook na wyniki:
+        self.nb = wx.Notebook(self, pos=(30,180), size=(500,180), name="Results")
 
     def calculate(self, e):
         """
@@ -178,18 +226,7 @@ class indexPanel(wx.Frame):
         #wyświetlenie informacji o błędzie, gdy nie wybrano żadnej kolumny:
         if (self.column == "" or self.column == None):
             self.message.SetLabel("You need to choose a column")
-            try:
-                self.richnessText.Destroy()
-                self.richness.Destroy()
-                self.bpText.Destroy()
-                self.bp.Destroy()
-                self.swText.Destroy()
-                self.sw.Destroy()
-                self.simText.Destroy()
-                self.sim.Destroy()
-                return
-            except:
-                return
+            return
 
         #zapisanie wybranych daych w liście:
         self.wybranaKolumna = (ord(self.column) - 65)
@@ -200,52 +237,60 @@ class indexPanel(wx.Frame):
 
         self.indexes = ind.indeksy(self.listForIndexes)
 
-        try:
-            self.richnessText.Destroy()
-            self.richness.Destroy()
-            self.bpText.Destroy()
-            self.bp.Destroy()
-            self.swText.Destroy()
-            self.sw.Destroy()
-            self.simText.Destroy()
-            self.sim.Destroy()
-        except:
-            pass
-
         #wyświetlenie komunikatu o błędzie, gdyby w danych jedna wartość lub więcej były puste, stringiem lub zerem
         if ((self.indexes[0] == None) or (self.indexes[0] == -1)):
             self.message.SetLabel("Error, could not calculate indexes. Check your data. It can not have strings, empty fields or negative values")
             return
 
+        #Sprawdzenie czy dla danej kolumny już policzono wynik:
+        self.pageCount = self.nb.GetPageCount()
+        if self.pageCount > 0:
+            for i in range(self.pageCount):
+                if self.nb.GetPageText(i) == self.column:
+                    return
+
         #obliczenie indeksów za pomocą napisanego skryptu oraz wyświetlenie wyników w panelu:
-        self.richnessText = tem.tekst(self, 30, 197, "Richness: ", 14)
-        self.richness = tem.tekst(self, 200, 200, (" " + str(self.indexes[0]) + " "))
-        self.richness.SetBackgroundColour((255,255,255))
-        self.bpText = tem.tekst(self, 30, 227, "Berger-Parker:", 14)
-        self.bp = tem.tekst(self, 200, 230, (" " + str(self.indexes[1]) + " "))
-        self.bp.SetBackgroundColour((255,255,255))
+        self.tab = wx.Panel(self.nb)
+        self.richnessText = tem.tekst(self.tab, 10, 17, "Richness: ", 14)
+        self.richness = tem.tekst(self.tab, 180, 20, (" " + str(self.indexes[0]) + " "))
+        #self.richness.SetBackgroundColour((255,255,255))
+        self.bpText = tem.tekst(self.tab, 10, 47, "Berger-Parker:", 14)
+        self.bp = tem.tekst(self.tab, 180, 50, (" " + str(self.indexes[1]) + " "))
+        #self.bp.SetBackgroundColour((255,255,255))
         self.dataBP.append((self.wybranaKolumna, self.indexes[1]))
-        self.swText = tem.tekst(self, 30, 257, "Shannon-Wiener:", 14)
-        self.sw = tem.tekst(self, 200, 260, (" " + str(self.indexes[2]) + "  |  max Value: " + str(self.indexes[4]) + " "))
-        self.sw.SetBackgroundColour((255,255,255))
+        self.swText = tem.tekst(self.tab, 10, 77, "Shannon-Wiener:", 14)
+        self.sw = tem.tekst(self.tab, 180, 80, (" " + str(self.indexes[2]) + "  |  max Value: " + str(self.indexes[4]) + " "))
+        #self.sw.SetBackgroundColour((255,255,255))
         self.dataSW.append((self.wybranaKolumna, self.indexes[2]))
-        self.simText = tem.tekst(self, 30, 287, "Simpson:", 14)
-        self.sim = tem.tekst(self, 200, 290, (" " + str(self.indexes[3]) + " "))
-        self.sim.SetBackgroundColour((255,255,255))
+        self.simText = tem.tekst(self.tab, 10, 107, "Simpson:", 14)
+        self.sim = tem.tekst(self.tab, 180, 110, (" " + str(self.indexes[3]) + " "))
+        #self.sim.SetBackgroundColour((255,255,255))
         self.dataSIM.append((self.wybranaKolumna, self.indexes[3]))
+
+        #Dodanie zakładki do panelu Notebook:
+
+        self.nb.AddPage(self.tab, self.column, select=True)
 
         #Zaktualizowanie wykresów o policzone indeksy:
         self.marker1 = plot.PolyMarker(self.dataBP, marker='circle', colour='red', legend='Berger-Parker')
         self.gc1 = plot.PlotGraphics([self.marker1], 'The change of Berger-Parker index', 'Column', 'Index value')
-        self.plotter1.Draw(self.gc1, xAxis=(int(0),int((self.numberOfColumns+1))), yAxis=(int(0),int(1)))
+        self.plotter1.Draw(self.gc1, xAxis=(int(0),int((self.numberOfColumns))), yAxis=(int(0),int(1)))
 
         self.marker2 = plot.PolyMarker(self.dataSW, marker='triangle', colour='black', legend='Shannon-Wiener')
         self.gc2 = plot.PlotGraphics([self.marker2], 'The change of Shannon-Wiener index', 'Column', 'Index value')
-        self.plotter2.Draw(self.gc2, xAxis=(int(0),int((self.numberOfColumns+1))))
+        self.plotter2.Draw(self.gc2, xAxis=(int(0),int((self.numberOfColumns))))
 
         self.marker3 = plot.PolyMarker(self.dataSIM, marker='cross', colour='blue', legend='Simpson')
         self.gc3 = plot.PlotGraphics([self.marker3], 'The change of Simpson index', 'Column', 'Index value')
-        self.plotter3.Draw(self.gc3, xAxis=(int(0),int((self.numberOfColumns+1))), yAxis=(int(0),int(1)))
+        self.plotter3.Draw(self.gc3, xAxis=(int(0),int((self.numberOfColumns))), yAxis=(int(0),int(1)))
+
+    def calculateAll(self, e):
+        """
+        Funkcja obliczająca parametry bioróżnorodności dla wszystkich możliwych kolumn, z których ma liczyć.
+        """
+        for i in range(len(self.choices)):
+            self.choicesBox.SetSelection(i)
+            self.calculate(e)
 
     def save1(self, e):
         """
