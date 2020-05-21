@@ -6,7 +6,7 @@ import pygbifTest as gbifSearch #skrypt obsługujący łączenie się z baza GBI
 import datetime #pakiet potrzebny do pobrania aktualnej daty
 import webbrowser #pakiet do wyszukiwania wybranego artykułu w bazie gbif
 
-class searchingPanel(wx.Frame):
+class searchingPanel(wx.Panel):
     """
     Panel ma na celu przeszukiwać bazę GBIF.org na podstawie wpisanej frazy. Najpierw sprawdza w
     bazie danych tej aplikacji czy taka fraza była już wyszukiwana. Jeżeli tak, pokazuje wyniki
@@ -16,9 +16,8 @@ class searchingPanel(wx.Frame):
     można nacisnąć guzik i zostanie otwarta przeglądarka internetowa wraz ze stroną dla tego rekordu
     w GBIF.org
     """
-    def __init__(self,parent,title):
-        wx.Panel.__init__(self, parent=parent, title=title)
-        self.Maximize()
+    def __init__(self,parent):
+        wx.Panel.__init__(self, parent=parent,size=parent.GetSize())
         #Wygląd panelu:
         self.searchingTekst = tem.tekst(self, 30, 28, "Enter what you want to search:", 14)
         self.searchingField = tem.pole(self, 300, 30)
@@ -139,8 +138,3 @@ class searchingPanel(wx.Frame):
             return
         webbrowser.open(('http://gbif.org/occurrence/'+str(self.dataTable[self.myChoice][0])), new=2)
 
-
-app = wx.App(False)
-frame = searchingPanel(None, "GBIF Monitoring v1.0")
-frame.Show()
-app.MainLoop()
