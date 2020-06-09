@@ -1,6 +1,7 @@
 import wx
 import searchingPanel
 import indexPanel
+import helpPanel
 
 class Okno(wx.Frame):
     def __init__ (self,parent,title):
@@ -10,6 +11,7 @@ class Okno(wx.Frame):
         self.panel_search.Hide()
         self.panel_index = indexPanel.indexPanel(self)
         self.panel_index.Hide()
+        self.panel_help = helpPanel.helpPanel(self)
 
         #MENU
         self.CreateStatusBar()
@@ -32,14 +34,28 @@ class Okno(wx.Frame):
             self.panel_index.Hide()
         except:
             pass
-        self.panel_search.Show()
+        try:
+            self.panel_help.Hide()
+        except:
+            pass
+        try:
+            self.panel_search.Show()
+        except:
+            pass
 
     def indexing(self, e):
         try:
             self.panel_search.Hide()
         except:
             pass
-        self.panel_index.Show()
+        try:
+            self.panel_help.Hide()
+        except:
+            pass
+        try:
+            self.panel_index.Show()
+        except:
+            pass
 
     def help(self, e):
         try:
@@ -48,6 +64,10 @@ class Okno(wx.Frame):
             pass
         try:
             self.panel_index.Hide()
+        except:
+            pass
+        try:
+            self.panel_help.Show()
         except:
             pass
 
