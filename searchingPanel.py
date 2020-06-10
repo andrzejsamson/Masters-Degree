@@ -41,11 +41,12 @@ class searchingPanel(wx.Panel):
         self.roz1 = self.GetSize()[0]
         self.listSearched = tem.lista(self, 30, 200, (self.roz1-70), 450)
         self.listSize = self.listSearched.GetSize()[0]
-        self.listSearched.InsertColumn(0, "Key:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.15))
-        self.listSearched.InsertColumn(1, "Country:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.15))
-        self.listSearched.InsertColumn(2, "Scientific name:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.35))
-        self.listSearched.InsertColumn(3, "Date:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.12))
-        self.listSearched.InsertColumn(4, "Recorded by:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.23))
+        self.listSearched.InsertColumn(0, "LP:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.02))
+        self.listSearched.InsertColumn(1, "Key:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.13))
+        self.listSearched.InsertColumn(2, "Country:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.15))
+        self.listSearched.InsertColumn(3, "Scientific name:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.35))
+        self.listSearched.InsertColumn(4, "Date:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.12))
+        self.listSearched.InsertColumn(5, "Recorded by:", wx.LIST_FORMAT_CENTER, width=(self.listSize*0.23))
         self.browserButton = tem.guzik(self, "Go to website", 30, 158)
         self.Bind(wx.EVT_BUTTON, self.goToWebsite, self.browserButton)
         self.browserMessage = tem.tekst(self, 150, 162, "", 10)

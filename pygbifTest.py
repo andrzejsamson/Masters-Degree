@@ -36,8 +36,11 @@ def searching(name, myDate):
         dataKey = dane[i]['key']
         wektor.append((dataKey,country,scientificName,eventDate,recordedBy)) #połączenie wyników z list do jednej listy
 
-    wektor.sort(key=takeDate,reverse=True) #poszeregowanie zmiennych po dacie, od daty najwcześniejszej
-    return wektor
+    #wektor.sort(key=takeDate,reverse=True) #poszeregowanie zmiennych po dacie, od daty najwcześniejszej
+    wektor_koncowy = list()
+    for i in range(len(wektor)):
+        wektor_koncowy.append((i+1,wektor[i][0],wektor[i][1],wektor[i][2],wektor[i][3],wektor[i][4]))
+    return wektor_koncowy
 
 def takeDate(elem):
     #funkcja potrzebna do szeregowania rekordów po dacie
