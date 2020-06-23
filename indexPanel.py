@@ -174,6 +174,7 @@ class indexPanel(wx.Panel):
         self.plotter1 = plot.PlotCanvas(self, pos=(700,30))
         self.plotter1.SetInitialSize(size=(600,200))
         self.plotter1.enableLegend = True
+        self.plotter1.enableZoom = True
         self.dataBP = list()
         self.marker1 = plot.PolyMarker(self.dataBP, marker='circle', colour='red', legend='Berger-Parker')
         self.gc1 = plot.PlotGraphics([self.marker1], 'The change of Berger-Parker index', 'Column', 'Index value')
@@ -188,6 +189,7 @@ class indexPanel(wx.Panel):
         self.plotter2 = plot.PlotCanvas(self, pos=(700,260))
         self.plotter2.SetInitialSize(size=(600,200))
         self.plotter2.enableLegend = True
+        self.plotter2.enableZoom = True
         self.dataSW = list()
         self.marker2 = plot.PolyMarker(self.dataSW, marker='triangle', colour='black', legend='Shannon-Wiener')
         self.gc2 = plot.PlotGraphics([self.marker2], 'The change of Shannon-Wiener index', 'Column', 'Index value')
@@ -202,6 +204,7 @@ class indexPanel(wx.Panel):
         self.plotter3 = plot.PlotCanvas(self, pos=(700,490))
         self.plotter3.SetInitialSize(size=(600,200))
         self.plotter3.enableLegend = True
+        self.plotter3.enableZoom = True
         self.dataSIM = list()
         self.marker3 = plot.PolyMarker(self.dataSIM, marker='cross', colour='blue', legend='Simpson')
         self.gc3 = plot.PlotGraphics([self.marker3], 'The change of Simpson index', 'Column', 'Index value')
